@@ -1,0 +1,1 @@
+https://github.com/perlatex/from-data-to-paper-minimal
