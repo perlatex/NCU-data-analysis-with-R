@@ -1,0 +1,107 @@
+---
+title: "模型输出"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo     = FALSE,
+    warning  = FALSE, 
+    message  = FALSE,
+    fig.asp  = 0.618,
+    dpi      = 300
+)
+```
+
+
+
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+wages <- read_csv("./demo_data/wages.csv")
+
+wages %>% head()
+```
+
+
+
+# 模型输出
+
+```{r}
+
+mod <- lm(earn ~ 1 + height + edu + sex, data = wages)
+
+```
+
+
+这里介绍4种模型输出方式
+
+
+1. 简约版，包含最基本的信息
+```{r}
+mod
+```
+
+
+
+2. 丰富版，汇总了模型的详细信息
+```{r}
+summary(mod)
+```
+
+
+
+3. 规整版，以数据框格式输出，符合tidyverse的风格
+```{r}
+library(broom)
+
+broom::tidy(mod)
+```
+
+
+4. 学术版，符合学术规范表格输出
+```{r}
+library(gtsummary)
+
+mod %>% 
+  gtsummary::tbl_regression()
+```
+
+
+
+
+
+```{r}
+mod %>% 
+  tbl_regression() %>%
+  modify_caption("modeling information")
+```
+
+
+
+
+# 多个模型比较
+```{r}
+library(modelsummary)
+
+models <- list(
+  "model 1" = lm(earn ~ 1 + height + edu,             data = wages),
+  "model 2" = lm(earn ~ 1 + height + edu + sex,       data = wages),
+  "model 3" = lm(earn ~ 1 + height + edu + age + sex, data = wages)
+)
+
+models %>% 
+  modelsummary(
+    estimate = "{estimate} [{conf.low}, {conf.high}]",
+    fmt = 2
+  )
+```
+
+

@@ -1,0 +1,314 @@
+---
+title: "R 语言基础"
+author: "王小胖"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+# 基本运算
+
+```{r}
+1 + 2
+```
+
+
+```{r}
+5 - 3
+```
+
+
+```{r}
+3 * 4
+```
+
+
+```{r}
+12 / 3
+```
+
+
+```{r}
+2^3
+```
+
+
+```{r}
+(2 + 4) / 3
+```
+
+
+# 对象
+
+```{r}
+x <- 5
+x
+```
+
+
+
+```{r}
+x <- 6
+x
+```
+
+
+```{r}
+typeof(x)
+```
+
+
+```{r}
+length(x)
+```
+
+
+
+
+
+# 向量就像冰糖葫芦
+```{r}
+x <- c(3, 
+       4, 
+       5, 
+       6, 
+       7)
+```
+
+
+```{r}
+x <- c(3, 4, 5, 6, 7)  # 从左到右书写，符合我们眼睛的习惯
+x
+```
+
+
+
+## 聚合成新向量
+
+```{r}
+low      <- c(1, 2, 3)
+high     <- c(4, 5, 6)
+sequence <- c(low, high)
+sequence
+```
+
+
+
+
+## 命名向量(named vector)
+```{r}
+x <- c('a' = 5, 'b' = 6, 'c' = 7, 'd' = 8)
+x
+```
+
+
+
+
+
+## 单个元素的向量
+```{r}
+x <- c(6)
+x <- 6      # 原来它也是向量，只不过长度为1而已
+```
+
+
+
+
+## 两个基本属性(类型与长度)
+```{r}
+x <- c(3, 4, 5, 6, 7)
+typeof(x)
+```
+
+
+```{r}
+length(x)
+```
+
+
+
+
+
+# 数值型向量
+
+```{r}
+x <- 300
+x
+```
+
+默认的都是双精度double, 如果非要强调是整数, 必须加上L
+```{r}
+x <- c(1L, 2L, 6L) 
+
+x <- c(123, -0.125)  
+
+x <- 300000000000
+
+x <- c(3e+06, 1.23e2)
+```
+
+  
+```{r}
+s1 <- seq(from = 0, to = 10, by = 0.5)
+s1
+```
+
+
+
+
+```{r}
+s2 <- rep(x = c(0, 1), times = 3)
+s2
+```
+
+
+```{r}
+s3 <- rep(x = c(0, 1), each = 3)
+s3
+```
+
+
+```{r}
+s4 <- 0:10  
+s4
+```
+
+
+```{r}
+s5 <- 10:1
+s5
+```
+
+
+
+
+# 字符串型向量
+```{r}
+x <- c("a", "b", "c")    
+x <- c('Alice', 'Bob', 'Charlie', 'Dave')    
+x <- c("hello", "baby", "I love you!") 
+```
+
+
+
+```{r}
+x1 <- c("1", "2", "3")
+x2 <- c(1, 2, 3)
+```
+
+
+
+
+
+# 逻辑型向量
+```{r}
+x <- c(TRUE, TRUE, FALSE, FALSE)
+x <- c(T, T, F, F)               # Equivalent, but not recommended
+```
+
+
+
+```{r}
+x1 <- c(TRUE, FALSE)             # logical
+x2 <- c("TRUE", "FALSE")         # character
+```
+
+
+
+
+# 因子型向量
+
+```{r}
+four_seasons <- c("spring", "summer", "autumn", "winter")
+four_seasons
+```
+
+```{r}
+four_seasons_factor <- factor(four_seasons)
+four_seasons_factor
+```
+
+
+
+
+
+```{r}
+four_seasons <- c("spring", "summer", "autumn", "winter")
+
+four_seasons_factor <- factor(
+  four_seasons, 
+  levels = c("summer", "winter", "spring", "autumn")
+)
+four_seasons_factor
+```
+
+
+
+
+# 数据结构 
+
+## 矩阵
+```{r}
+m <- matrix(
+  c(2, 4, 3, 1, 5, 7),
+  nrow = 2, 
+  ncol = 3
+)
+m
+```
+
+
+```{r}
+dim(m)
+```
+
+
+
+
+## 列表
+```{r}
+list1 <- list(
+  a = c(5, 10),
+  b = c("I", "love", "R", "language", "!"),
+  c = c(TRUE, TRUE, FALSE, TRUE)
+)
+list1
+```
+
+
+
+
+## 数据框
+```{r}
+df <- data.frame(
+  name      = c("Alice", "Bob", "Carl", "Dave"),
+  age       = c(23, 34, 23, 25),
+  marriage  = c(TRUE, FALSE, TRUE, FALSE),
+  color     = c("red", "blue", "orange", "purple")
+)
+df
+```
+
+
+```{r}
+nrow(df)
+```
+
+
+```{r}
+ncol(df)
+```
+
+
+
+
+
+
+

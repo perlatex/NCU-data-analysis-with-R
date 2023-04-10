@@ -1,0 +1,20 @@
+
+
+
+```{r}
+my_pkgs <- 
+  c("tidyverse", "palmerpenguins", "sf", "janitor", "rstatix", "report",
+    "devtools", "broom", "gt", "gtsummary", "haven", "ggridges", "ggstatsplot",
+    "modelsummary", "readxl", "rmarkdown", "scales", "pysch", "equatiomatic",
+    "officedown", "flextable", "marginaleffects", "showtext", "colorspace",
+    "cowplot", "patchwork", "MetBrewer", "styler", "ggtheme", "bookdown"
+    )
+
+install.packages(my_pkgs, 
+    repos = "http://mirrors.tuna.tsinghua.edu.cn/CRAN", 
+    dependencies = T
+)
+```
+
+
+

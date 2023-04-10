@@ -1,0 +1,139 @@
+---
+title: "从数据到论文---愉快地写作"
+subtitle: "关于一篇论文的复现"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, hygge, ninjutsu, xaringan-themer.css]
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  message    = FALSE,
+  warning    = FALSE,
+  out.width  = "100%",
+  fig.asp    = 0.618, 
+  fig.show   = "hold",
+  fig.pos    = "center",
+  fig.align  = "center",
+  dpi        = 600
+)
+
+options(
+  digits = 3,
+  knitr.table.format = "html"
+)
+```
+
+
+
+---
+## 提纲
+
+<br><br>
+
+<font size="6"> 
+
+<span class="tab"></span> - 文档框架                       <br>
+<span class="tab"></span> - 论文章节                       <br>
+<span class="tab"></span> - 插入图片（外部图片、统计图形） <br>
+<span class="tab"></span> - 插入表格（简单表格、模型表格） <br>
+<span class="tab"></span> - 插入公式                       <br>
+<span class="tab"></span> - 交叉引用（图表、公式、章节）   <br>
+<span class="tab"></span> - 参考文献                       <br>
+
+
+</font> 
+
+
+
+
+
+---
+##  解锁 bookdown
+
+了解bookdown的文件结构及其功能
+
+<br>
+
+```markdown
+directory/
+├── from-data-to-paper.Rproj    (项目开始，从这里点进去)
+├── index.Rmd                   (包含文档的基本信息)
+├── 01-intro.Rmd
+├── 02-review.Rmd
+├── 03-method.Rmd
+├── 04-data-analysis.Rmd
+├── 05-conclusion.Rmd
+├── 06-references.Rmd
+├── Appendix.Rmd
+├── _bookdown.yml               (配置文件)
+├── _output.yml                 (指定输出格式)
+├──  book.bib                   (参考文献)
+└──  custom-reference-doc.docx  (定制Word文档风格)
+
+```
+
+
+
+---
+## 课堂练习 (20 分钟)
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<font size="6"> 
+
+.center[用小学生跑步的案例，<br>替换潘薇老师bookdown中的[`04-data-analysis.Rmd`]()，<br>生成整本论文]
+
+</font> 
+
+
+---
+## 期末考核
+
+<br>
+<br>
+
+<font size="6"> 
+
+1、平时作业。至少2次， 占总成绩 40%
+
+<br>
+<br>
+
+2、期末考核。找一份数据，按照小学生跑步案例的流程，完成数据分析工作，要求有基础统计，可视化探索，建立模型以及边际效应预测等内容，最后渲染成word文档。并于4月23日之前，打包发送到我的QQ邮箱。作为考核内容。占总成绩的 60%
+
+</font> 
+
+
+---
+class: center, middle
+
+# [**感谢 R 语言之美!**]()
+
+<br>
+
+| 主题     	| 需要掌握的宏包                            	   |
+|:---------	|:-----------------------------------------------|
+| 数据处理 	| dplyr                                     	   |
+| 可视化   	| ggplot2                                   	   |
+| 建模     	| lm()/glm(), rstatix, psych, marginaleffects  	 |
+| 写作     	| Rmarkdown, flextable, gtsummary, modelsummary  |
+
+
+
+

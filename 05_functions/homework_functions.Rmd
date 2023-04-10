@@ -1,0 +1,32 @@
+---
+title: "函数"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+## 作业
+
+
+1. 找出x向量中最大值、最小值、均值、方差以及元素之和
+```{r}
+x <- c(2, 7, 8, 9, 3)
+x
+```
+
+
+
+2. 根据方差的数学表达式，写出**方差**计算函数，并与基础函数`var()`的结果对比
+
+$$
+\mathrm{Var}(x) = \frac{1}{n - 1} \sum_{i=1}^n (x_i - \bar{x}) ^2 
+$$

@@ -1,0 +1,72 @@
+---
+title: "可视化作业"
+author: "姓名"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+    # toc: yes
+    tables:
+      caption:
+        pre: '表 '
+    plots:
+      caption:
+        pre: '图 '
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo         = TRUE,
+    warning      = FALSE, 
+    message      = FALSE,
+    fig.cap      = TRUE,
+    fig.align    = "center", 
+    out.width    = "100%",
+    fig.width    = 5, 
+    fig.asp      = 0.618,
+    dev          = "ragg_png",
+    dpi          = 300, 
+    fig.showtext = TRUE
+)
+options(digits = 4)
+```
+
+
+
+我们的课程目标：用R语言生成一份完整的word分析报告，内容包括读取数据，画出图形，并建立线性模型。
+
+
+# 读取数据
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+library(gapminder)
+
+gapminder %>% head()
+```
+
+# 筛选2007年的记录
+
+
+
+# 画出2007年人均寿命与人均GDP的散点图 
+(提示：人均GDP为x轴，人均寿命为y轴)
+
+
+
+
+# 画出2007年人均寿命的对数与人均GDP对数的散点图
+
+
+
+
+# 在上图的基础上，给不同的洲添加不同的颜色
+
+
+
+# 继续在上图的基础上，希望点的大小代表着该国家人口数量
+
+
+
+

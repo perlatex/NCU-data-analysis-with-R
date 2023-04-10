@@ -1,0 +1,39 @@
+---
+title: "数据分析"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo     = FALSE,
+    warning  = FALSE, 
+    message  = FALSE,
+    fig.asp  = 0.618,
+    dpi      = 300
+)
+options(digits = 3)
+```
+
+
+今天我们重复潘薇老师的硕士论文《员工知识共享动机对员工创造力的影响研究》中数据分析章节。
+大家生成word文档并提交我的邮箱`38552109@qq.com`，作为R语言课程的期末考核。
+
+
+
+# 导入数据
+
+我们读取文件夹`data`中清洗之后的数据`df.rds`
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+df <- read_rds("./data/df.rds")
+
+```
+

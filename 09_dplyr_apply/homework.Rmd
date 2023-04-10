@@ -1,0 +1,52 @@
+---
+title: "企鹅的故事"
+author: "姓名"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+    # toc: yes
+    tables:
+      caption:
+        pre: '表 '
+    plots:
+      caption:
+        pre: '图 '
+---
+
+
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+
+penguins <- palmerpenguins::penguins %>% drop_na()
+
+penguins %>% head()
+```
+
+
+# 作业
+
+1. 统计不同性别企鹅的数量
+
+
+2. 不同岛屿的女企鹅的嘴峰深度均值不同？
+
+
+3. 每种类型企鹅，各种体征属性的均值？
+
+
+4. 各种体征属性的标准化（提示，标准化函数如下）
+```{r}
+std <- function(x) {
+   (x - mean(x)) / sd(x)
+}
+```
+
+
+
+其中3, 4题推荐使用 `across()`
+
+
+

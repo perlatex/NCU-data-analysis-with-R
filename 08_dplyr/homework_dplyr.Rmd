@@ -1,0 +1,58 @@
+---
+title: "dplyr作业"
+author: "姓名"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+    # toc: yes
+    tables:
+      caption:
+        pre: '表 '
+    plots:
+      caption:
+        pre: '图 '
+---
+
+
+
+# 作业
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+kidiq <- read_rds("./data/kidiq.RDS") 
+kidiq %>% head()
+```
+
+
+- kid_score : 小孩考试分数
+- mom_hs    : 母亲是否完成高中
+- mom_iq    : 母亲IQ值
+- mom_age   : 母亲年龄
+
+
+# 问题
+
+1. 说出数据框中每一列的变量类型
+
+2. 统计考试的平均成绩和标准差
+
+3. 统计母亲完成高中的比例，提示
+```{r}
+x <- c(0, 1, 0, 0, 1)
+
+prop <- sum(x) / length(x)
+prop
+```
+
+
+4. 构建新的一列`index`，其中 $index = mom_iq/mom_age$
+
+5. 中心化 mom_iq，然后放到新的一列（提示：中心化 = mom_iq值 - 全部mom_iq的均值，`mom_iq - mean(mom_iq)`）
+
+6. 按mom_hs分组，计算 mom_iq 均值、kid_score的均值以及mom_age的最大值
+
+
+

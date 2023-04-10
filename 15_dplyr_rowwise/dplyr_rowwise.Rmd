@@ -1,0 +1,191 @@
+---
+title: "行方向上的统计"
+author: "王小二"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    highlight: pygments
+    code_download: true
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+---
+
+
+
+
+
+# 提问
+
+假定`id`是学生编号，`w, x, y, z`是各科成绩
+```{r}
+library(tidyverse)
+
+df <- tibble::tribble(
+     ~id,   ~w,  ~x,  ~y,  ~z,
+     "a",  10,   20,  30,  40,
+     "b",  11,   21,  31,  41,
+     "c",  12,   22,  32,  42,
+     "d",  13,   23,  33,  43,
+     "e",  14,   24,  34,  44,
+     "f",  15,   25,  35,  45
+     )
+
+df
+```
+
+我们现在想计算每行`w, x, y, z`的均值，
+
+```{r}
+df %>% 
+  mutate(
+    avg = mean(c(w, x, y, z))
+  )
+```
+
+好像不对？为什么呢？
+
+
+我们知道 `w, x, y, z` 是列向量（一根根糖葫芦），放入`c()`函数聚合后，就是一个大的向量，计算`mean()`相当于对所有的数值一起做了均值，得到一个数。 
+
+
+
+
+
+# 数据框中的向量
+
+tidyverse遵循的tidy原则，一列表示一个变量，一行表示一次观察。
+这种数据存储格式，**列方向**的操作很方便，但在某些特定的场合我们需要**行方向**操作。
+
+```{r, out.width = '100%', fig.align='left', echo = FALSE}
+knitr::include_graphics(path = "images/vctr.png")
+```
+
+
+## 方法 1
+
+可以写成这样
+
+```{r}
+df %>% 
+  mutate(
+    avg = (w + x + y + z)/4
+  )
+```
+
+但变量多了，又变成了体力活。而且如果有缺失值，这种方法也会失效。
+
+```{r}
+tb <- tibble::tribble(
+     ~id,  ~w,  ~x,  ~y,  ~z,
+     "a",  10,  20,  30,  NA,
+     "b",  11,  21,  31,  41,
+     "c",  12,  22,  32,  42,
+     "d",  13,  23,  33,  43,
+     "e",  14,  24,  34,  44,
+     "f",  15,  25,  35,  45
+   )
+```
+
+
+```{r}
+tb %>% 
+  mutate(
+    avg = (w + x + y + z)/4
+  )
+```
+
+## 方法 2
+
+现在可以用 `rowwise()`
+
+```{r }
+df %>%
+  rowwise() %>%
+  mutate(avg = mean(c(w, x, y, z)))
+```
+
+
+```{r}
+tb %>%
+  rowwise() %>%
+  mutate(avg = mean(c(w, x, y, z), na.rm = TRUE))
+```
+
+欧力给！
+
+
+`rowwise()`让数据框按照**行方向**操作，即数据框的每一行就是分成一组，这个时候`w, x, y, z`  不再是列向量，而是单个值，比如第一行`w[1], x[1], y[1], z[1]`，第二行`w[2], x[2], y[2], z[2]`， 依次放入`c()`函数并计算`mean()`，正好是每行的数值的均值。
+
+
+
+## 方法 3
+
+更轻便的方法是`rowwise() + c_across()`
+
+如果数据很多列的话，我想偷懒，毕竟`select()`的语法，让人沉醉。
+我们可以使用`rowwise() + c_across()`组合，让代码变的轻巧一点。
+
+
+```{r}
+df %>%
+  rowwise() %>%
+  mutate(
+    avg = mean(c_across(w:z))
+  )
+```
+
+
+
+```{r}
+df %>%
+  rowwise() %>%
+  mutate(
+    mean = mean(c_across(where(is.numeric)))
+  )
+```
+
+
+```{r}
+tb %>%
+  rowwise() %>%
+  mutate(
+    mean = mean(c_across(where(is.numeric)), na.rm = TRUE)
+  )
+```
+
+
+`c_across() = c() + across()` 的意思，`across()`就是选择多列的意思，然后`c()`聚合成新的向量。
+当然`c_across()`它不能单独使用，而是要和`rowwise()`组合使用，所以，`c_across()`最终聚合的是行方向的向量。
+
+- 函数`c_across()`延续了`select()/across()`选择多列的优秀语法
+- 函数`c_across()`要和`rowwise()`组合使用，即`c_across()`是把数据框的每一行聚合成新的向量
+
+
+
+
+# 课堂练习
+
+```{r, message=FALSE, warning=FALSE}
+scores <- 
+ tibble::tribble(
+   ~name, ~english, ~chinese, ~math, ~sport, ~psy, ~edu,
+     "A",     133,    100,    102,     56,    89,   89,
+     "B",     120,    120,     86,     88,    45,   75,
+     "C",      98,    109,    114,     87,    NA,   84,
+     "D",     120,     78,    106,     68,    86,   69,
+     "E",     110,     99,    134,     98,    75,   70,
+     "F",      NA,    132,    130,     NA,    68,   88
+   )
+scores
+```
+
+
+- 计算每位同学的平均成绩
+
+- 计算每位同学的语数外的均值和其他科目的均值
+
+
+

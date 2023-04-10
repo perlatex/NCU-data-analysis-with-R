@@ -1,0 +1,198 @@
+---
+title: "从数据到论文--模型探索"
+subtitle: "小学生短跑的案例"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo     = FALSE,
+  warning  = FALSE, 
+  message  = FALSE,
+  fig.asp  = 0.618,
+  dpi      = 300
+)
+options(digits = 3)
+```
+
+
+我们的课程目标：用R语言生成一份完整的word分析报告，内容包括读取数据，画出图形以及建立模型。
+
+
+```{r, echo=FALSE}
+library(tidyverse)
+```
+
+
+# 数据
+
+这里是小学生50米短跑的成绩
+
+```{r, echo=FALSE}
+d <- read_csv("./demo_data/data-50m.csv")
+
+d %>% slice_head(n = 10)
+```
+
+变量含义
+
+- Y：      短跑速度 (m/s)
+- Weight： 体重 (kg)
+- Age：    年龄 (year)
+
+
+
+# 体重越大，跑步越慢？
+
+我们先画出体重与速度的散点图
+```{r}
+p1 <- d %>% 
+  ggplot(aes(x = Weight, y = Y)) +
+  geom_point(size = 4) +
+  theme_classic()
+p1
+```
+
+我们看到，体重与跑步速度是正相关。我们建立线性模型看看
+
+
+```{r, echo=TRUE}
+mod1 <- lm(Y ~ 1 + Weight, data = d)
+```
+
+
+```{r}
+mod1 %>% 
+  gtsummary::tbl_regression()
+```
+
+
+于是我们很自信地在图中画出拟合直线
+```{r}
+d %>% 
+  ggplot(aes(x = Weight, y = Y)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm") +
+  theme_classic()
+```
+
+
+体重越大，速度越快？似乎与我们生活常识不太相符啊。于是我们添加年龄这个非常重要的变量。
+
+
+# 多元回归
+
+不同年龄，不同的分组
+
+```{r}
+p2 <- d %>% 
+  mutate(Age = as.factor(Age)) %>% 
+  
+  ggplot(aes(x = Weight, y = Y, color = Age, shape = Age)) +
+  geom_point(size = 4) +
+  theme_classic()
+p2
+```
+
+
+```{r, fig.asp=0.4, eval=FALSE, include=FALSE}
+library(patchwork)
+
+p1 + p2
+```
+
+
+```{r, fig.asp=0.4, eval=FALSE, include=FALSE}
+library(cowplot)
+
+plot_grid(p1, p2, axis = "rl")
+```
+
+
+然后建立二元回归模型
+
+```{r, echo=TRUE}
+mod2 <- lm(Y ~ 1 + Weight + Age, data = d)
+```
+
+
+
+模型给出了系数结果
+```{r}
+mod2 %>% 
+  gtsummary::tbl_regression()
+```
+
+
+我们发现增加了Age变量之后，体重的系数发生了翻转，由原来的正值成了负值。
+
+我们下面来解释这个模型：
+
+1. 保持体重不变，查看速度随年龄的变化
+
+```{r}
+library(marginaleffects)
+
+newdt <- tibble(
+  Weight = mean(d$Weight),
+  Age    = unique(d$Age)
+)
+
+mod2 %>% 
+  marginaleffects::predictions(newdata = newdt, conf_level = 0.9) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = Age, y = estimate)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill = "gray", alpha = 0.5)
+```
+
+2. 保持年龄不变，查看速度随体重的变化
+```{r}
+newdt <- tibble(
+  Weight = seq(min(d$Weight), max(d$Weight), by = 0.5),
+  Age    = mean(d$Age)
+)
+
+
+mod2 %>% 
+  marginaleffects::predictions(newdata = newdt, conf_level = 0.9) %>% 
+  as_tibble() %>% 
+  ggplot(aes(x = Weight, y = estimate)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill = "gray", alpha = 0.5)
+```
+
+
+由图可见，年龄是速度提升的主要因素，同时也看到体重对速度是负的影响。但感觉怪怪的呢？
+
+未完待续...
+
+
+# 更简便的办法
+
+直接使用`marginaleffects`宏包中的`plot_predictions()`函数，完成上述预测（偷懒虽好，但要懂得含义喔）
+
+```{r, fig.asp=0.4}
+library(marginaleffects)
+
+plot1 <- plot_predictions(mod2, condition = "Age")  +
+  ggtitle("holding on weight")
+
+plot2 <- plot_predictions(mod2, condition = "Weight") + 
+  ggtitle("holding on age")
+
+
+library(cowplot)
+plot_grid(plot1, plot2, align = "h")
+```
+
+
+
+

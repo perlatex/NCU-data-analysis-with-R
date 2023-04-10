@@ -1,0 +1,91 @@
+---
+title: "气温与冰淇淋销量"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo     = FALSE, 
+  warning  = FALSE, 
+  message  = FALSE,
+  fig.asp  = 0.618,
+  dpi      = 300
+)
+```
+
+
+我们的课程目标：用R语言生成一份完整的word分析报告，内容包括读取数据，画出图形以及建立模型。
+
+
+# 数据
+
+我们首先读入冰激凌的数据
+
+```{r, echo=FALSE}
+library(tidyverse)
+
+icecream <- readxl::read_excel("icecream.xlsx")
+icecream 
+```
+
+
+
+# 画图
+
+我们画图看看
+
+```{r, echo=FALSE}
+icecream %>% 
+  ggplot(aes(x = temp, y = units)) +
+  geom_point(size = 4) +
+  theme_classic()
+```
+
+
+
+
+# 模型
+
+我们发现气温与冰激凌销量存在线性关系，所以建立线性模型 
+
+$$
+y = \alpha + \beta x + \epsilon, \qquad  \epsilon \in N(0, \sigma)
+$$
+
+
+下面开始建模
+
+```{r}
+mod <- lm(units ~ 1 + temp, data = icecream)
+summary(mod)
+```
+
+
+
+# 分析
+
+我们关注模型的系数，整理成表格如下
+
+```{r, echo=FALSE}
+mod %>% broom::tidy()
+```
+
+
+
+最后，我们在图中添加模型的拟合直线
+
+```{r, echo=FALSE}
+icecream %>% 
+  ggplot(aes(x = temp, y = units)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm") +
+  theme_classic()
+```
+
+

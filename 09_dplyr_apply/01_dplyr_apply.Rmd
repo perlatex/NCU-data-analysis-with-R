@@ -1,0 +1,406 @@
+---
+title: "advance dplyr"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+    # toc: yes
+    tables:
+      caption:
+        pre: '表 '
+    plots:
+      caption:
+        pre: '图 '
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo         = TRUE,
+    warning      = FALSE, 
+    message      = FALSE,
+    fig.cap      = TRUE,
+    fig.align    = "center", 
+    out.width    = "100%",
+    fig.width    = 5, 
+    fig.asp      = 0.618,
+    dev          = "ragg_png",
+    dpi          = 300, 
+    fig.showtext = TRUE
+)
+options(digits = 4)
+```
+
+
+
+今天继续讲关于企鹅的故事。
+
+```{r message = FALSE, warning = FALSE, echo=FALSE}
+library(tidyverse)
+
+penguins <- palmerpenguins::penguins %>% 
+  tidyr::drop_na() %>% 
+  select(species, sex, bill_length_mm, bill_depth_mm, body_mass_g)
+
+penguins %>%
+  head(6)
+```
+
+
+# 每种类型企鹅有多少只？
+
+使用 `n()`函数，统计**当前分组数据框**的行数
+
+
+数据框没有分组的时候，返回整个数据框的行数
+
+```{r}
+penguins %>%
+  summarise(
+    n = n()
+  ) 
+```
+
+数据框有分组的时候，返回每个数据框的行数
+```{r}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    n = n()
+  )
+```
+
+
+统计某个变量中各**类别**出现的次数，可以使用`count()`函数, 类似点名，男生多少，女生多少。或者，穿红衣服的多少，穿绿色衣服的多少人。
+
+```{r}
+penguins %>% count(species)
+```
+
+
+不同性别的企鹅各有多少
+```{r}
+penguins %>% count(sex)
+```
+
+
+如果给定多个变量，那就统计各类别的组合分别出现的频次
+```{r}
+penguins %>% count(sex, species)
+```
+
+
+
+
+
+# 弱水三千，只取一瓢
+```{r}
+penguins %>% 
+  head()
+
+penguins %>% 
+  tail()
+```
+
+
+```{r}
+penguins %>% 
+  slice(1)
+```
+
+
+```{r}
+penguins %>% 
+  slice(1:5)
+```
+
+
+```{r}
+penguins %>% 
+  group_by(species) %>% 
+  slice(1)
+```
+
+
+```{r}
+penguins %>% 
+  slice_head(n = 5)
+```
+
+
+```{r}
+penguins %>% 
+  slice_tail(n = 5)
+```
+
+
+```{r}
+penguins %>% 
+  slice_sample(n = 5)
+```
+
+
+```{r}
+penguins %>% 
+  slice_sample(prop = 0.05)
+```
+
+
+# 嘴峰长度最大那一行
+
+三种方法
+
+```{r}
+penguins %>%
+  filter(bill_length_mm == max(bill_length_mm))
+```
+
+
+```{r}
+penguins %>% 
+  arrange(desc(bill_length_mm)) %>% 
+  slice(1)
+```
+
+可读性更强
+```{r}
+penguins %>% 
+  slice_max(bill_length_mm)
+```
+
+
+**课堂练习**，
+
+- 男性企鹅，嘴峰最大的行
+- 嘴峰长度和嘴峰厚度之和最大的企鹅
+
+
+
+
+嘴峰长度最大的前三名
+```{r}
+penguins %>% 
+  slice_max(bill_length_mm, n = 3)
+```
+
+
+嘴峰长度最大的前1%
+```{r}
+penguins %>% 
+  slice_max(bill_length_mm, prop = 0.01)
+```
+
+
+不同物种的嘴峰长度最大的前三
+```{r}
+penguins %>% 
+  group_by(species) %>% 
+  slice_max(bill_length_mm, n = 3)
+```
+
+非常的顺滑和优雅！
+
+
+
+
+# 有关NA的计算
+
+`NA`很讨厌，凡是它参与的四则运算，结果都是`NA`，
+
+
+```{r}
+typeof(TRUE)
+typeof(NA)
+```
+
+
+```{r}
+sum(c(1, 2, NA, 4))
+```
+
+所以需要事先把它删除，增加参数说明 `na.rm = TRUE`
+```{r}
+sum(c(1, 2, NA, 4), na.rm = FALSE)
+```
+
+```{r}
+mean(c(1, 2, NA, 4), na.rm = TRUE)
+```
+
+
+
+# 寻找企鹅中的胖子
+
+```{r}
+penguins %>% 
+  select(species, body_mass_g) %>% 
+  slice_sample(n = 5) %>% 
+  mutate(
+    body = if_else(body_mass_g > 4200, "you are fat", "you are fine")
+  )
+```
+
+
+# 给企鹅身材分类
+
+```{r}
+penguins %>% 
+  select(species, body_mass_g) %>% 
+  head(5) %>% 
+  mutate(body = case_when(
+    body_mass_g < 3500                       ~ "best",
+    body_mass_g >= 3500 & body_mass_g < 4500 ~ "good",
+    body_mass_g >= 4500 & body_mass_g < 5500 ~ "general",
+   .default                                  = "other"
+  )
+)
+```
+
+实际应用场景中非常有用，比如
+```{r}
+df_country <-
+  tibble(x = c("USA", "Canada", "France", "UK", "China", NA, "Mexico", "Russia"))
+
+df_country %>% mutate(
+  continent =
+    case_when(
+      x %in% c("USA", "Canada", "Mexico") ~ "North America",
+      x %in% c("France", "UK")            ~ "Europe",
+      x %in% "China"                      ~ "Asia"
+    )
+)
+
+df_country %>% mutate(
+  continent =
+    case_match(
+      x,
+      c("USA", "Canada", "Mexico") ~ "North America",
+      c("France", "UK")            ~ "Europe",
+      "China"                      ~ "Asia"
+    )
+)
+
+df_country %>% mutate(
+  continent =
+    case_match(
+      x,
+      c("USA", "Canada", "Mexico") ~ "North America",
+      c("France", "UK")            ~ "Europe",
+      "China"                      ~ "Asia",
+      NA                           ~ "missing",
+      .default                     = "unknown"
+    )
+)
+```
+
+
+# 新增列
+
+计算每只企鹅嘴峰厚度和长度的比例，以及嘴峰面积
+
+```{r, eval=FALSE}
+penguins %>% 
+  mutate(
+    bill_ratio = bill_depth_mm / bill_length_mm,
+    bill_area  = bill_depth_mm * bill_length_mm
+  )
+```
+
+
+
+
+# summarise() vs. mutate()
+
+## 区分 `summarise()` 与 `mutate()`
+
+```{r, eval=FALSE}
+penguins %>%
+  summarise(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+```{r, eval=FALSE}
+penguins %>%
+  mutate(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+## 区分 `groupby() + summarise()` 与 `groupby() + mutate()`
+```{r, eval=FALSE}
+penguins %>%
+  group_by(species) %>%
+  summarise(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+```{r, eval=FALSE}
+penguins %>%
+  group_by(species) %>%
+  mutate(
+    normalized_mass = (body_mass_g - mean(body_mass_g))/sd(body_mass_g)
+  )
+```
+
+
+# 强制转换及其应用
+
+## 强制转换
+向量中的元素必须是相同的类型，但如果不一样呢，会发生什么？
+这个时候R会**强制转换**成相同的类型。这就涉及数据类型的转换层级
+
+- `character` > `numeric` > `logical`
+- `double` > `integer`
+
+比如这里会强制转换成字符串类型
+```{r}
+c("foo", 1, TRUE)
+```
+
+这里逻辑型会强制转换成数值型
+```{r}
+c(1, TRUE, FALSE)
+```
+
+```{r}
+c(TRUE, TRUE, FALSE) %>% sum()
+```
+
+
+## 应用
+
+补全下面代码，求嘴峰长度大于40mm的占比？
+
+```{r, eval=FALSE}
+penguins %>% 
+  select(species, bill_length_mm) %>% 
+  mutate(is_bigger40 = bill_length_mm > 40)
+```
+
+我们进一步用sum()函数将逻辑型强制转换成数值型
+
+```{r, eval=FALSE}
+penguins %>% 
+  mutate(is_bigger40 = bill_length_mm > 40) %>% 
+  summarise(
+    prop = sum(is_bigger40) / n()
+  )
+```
+
+以上代码最终可以简化为
+```{r}
+penguins %>% 
+  summarise(
+    prop = sum(bill_length_mm > 40) / n()
+  )
+```
+
+从头梳理思路，`bill_length_mm > 40`构建了一个逻辑型向量，然后对这个逻辑型向量求和，求和的结果是多少，就说明逻辑型向量中有多少个TRUE，也就说明满足条件的样本有多少个，然后除以样本总的个数，最后得出比例。
+
+**课堂练习**，不同物种，嘴峰长度大于40的比例分别是多少？

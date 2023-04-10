@@ -1,0 +1,30 @@
+---
+title: "案例分析"
+author: "王大宝"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo         = TRUE,
+    warning      = FALSE, 
+    message      = FALSE
+)
+options(digits = 3)
+```
+
+
+我们的课程目标：用R语言读取数据，画出图形，并建立线性模型，最后生成完整的word分析报告。
+
+
+# 数据
+
+1. 读取一份数据
+2. 简单的函数计算
+3. 然后渲染成 word 文档
+

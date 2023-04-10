@@ -1,0 +1,457 @@
+---
+title: "ggplot2之几何形状"
+author: "王敏杰"
+date: "`r Sys.Date()`"
+output: 
+  officedown::rdocx_document:
+    number_sections: yes
+    df_print: kable
+    # toc: yes
+    tables:
+      caption:
+        pre: '表 '
+    plots:
+      caption:
+        pre: '图 '
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo         = TRUE,
+    warning      = FALSE, 
+    message      = FALSE,
+    fig.cap      = TRUE,
+    fig.align    = "center", 
+    out.width    = "100%",
+    fig.width    = 5, 
+    fig.asp      = 0.618,
+    dev          = "ragg_png",
+    dpi          = 300, 
+    fig.showtext = TRUE
+)
+options(digits = 4)
+```
+
+
+
+# 数据类型
+
+
+| ggplot2的视角 	| R数据类型               	|
+|---------------	|--------------------------	|
+| 离散变量      	| 字符串型, 因子型, 逻辑型 	|
+| 连续变量      	| 双精度数值, 整数数值     	|
+| 日期变量      	| 日期, 时间, 日期时间     	|
+
+
+
+
+我们在ggplot2绘图的时候，可能会同时用到多种类型的变量，比如
+
+* 一个离散
+* 一个连续
+
+* 两个离散
+* 两个连续
+* 一个离散, 一个连续
+
+* 三个连续
+
+
+
+
+
+# 开始
+
+还是用企鹅数据
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+penguins <- palmerpenguins::penguins %>% 
+  tidyr::drop_na() %>% 
+  select(species, sex, bill_length_mm, bill_depth_mm, body_mass_g) 
+
+penguins %>% 
+  head(6)
+```
+
+
+
+## 每个种类有多少企鹅
+
+按照常规的思路，我们一般会先统计每个种类企鹅的数量，然后喂给`ggplot()`
+
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_point()
+```
+
+呈现某个类别的数量多少，常用柱状图，因此可以选择`geom_col()`这种几何形状
+
+```{r}
+penguins %>%
+  count(species) %>%
+  ggplot(aes(x = species, y = n)) +
+  geom_col()
+```
+
+
+画出每个种类嘴峰长度的均值
+
+```{r}
+penguins %>% 
+  group_by(species) %>% 
+  summarise(bill_length_mean = mean(bill_length_mm)) %>% 
+  
+  ggplot(aes(x = species, y = bill_length_mean)) +
+  geom_col(width = 0.5, fill = "chocolate4")
+```
+
+
+
+## 嘴峰长度的分布
+
+画一个连续变量的分布，可以用**直方图和密度图**
+
+### 直方图
+嘴峰长度是连续变量，可以用直方图
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm)) +
+  geom_histogram(color = "white", fill = "chocolate4")
+```
+
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, fill = species)) +
+  geom_histogram(bins = 35, alpha = 0.7, position = "identity", color = "white")
+```
+
+
+### 密度图
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm)) +
+  geom_density()
+```
+
+
+为什么是两个峰？如何探究背后的原因？
+
+- 种类不同导致的？
+- 性别不同导致的？
+- 还是所在岛屿不同导致的？
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, fill = species, colour = species)) +
+  geom_density(alpha = 0.7)
+```
+
+
+
+## 不同种类，嘴峰长度分布
+
+这里一个是离散变量，一个是连续变量。可以选择不同的几何形状来呈现
+
+### 散点图
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_point()
+```
+
+
+
+### 抖散图
+
+点重叠的处理方案
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_jitter()
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm, color = species)) +
+  geom_point(
+    position = position_jitter(width = 0.3, height = 0.06),
+    alpha = 0.9,
+    shape = 21,
+    size = 3
+  )
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = sex, y = body_mass_g)) +
+  geom_jitter(
+    width = 0.25, 
+    fill = "#FF8C00", 
+    size = 5, 
+    shape = 21
+  ) 
+```
+
+
+### 箱线图
+可以用箱线图（箱线图可以显示分布的中位数、分位数等）
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) +
+  geom_boxplot() 
+```
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, y = body_mass_g, fill = sex)) +
+  geom_boxplot()
+```
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm, color = species)) +
+  geom_boxplot() +
+  geom_jitter()
+```
+
+
+
+
+### 小提琴图
+
+当前期刊比较喜欢的风格
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm, color = species)) +
+  geom_violin(fill = "grey90") +
+  geom_jitter()
+```
+
+
+
+```{r}
+penguins %>%
+  ggplot(aes(x = species, y = bill_length_mm)) + 
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +
+  geom_jitter()
+```
+
+
+
+
+
+```{r}
+penguins %>% 
+  ggplot(aes(x = species, y = body_mass_g, fill = sex, colour = sex)) +       
+  geom_violin(alpha = 0.1, trim = FALSE) +
+  geom_point(
+    position = position_jitterdodge(dodge.width = 0.9),
+    alpha = 0.5,
+    show.legend = FALSE
+  )
+```
+
+
+
+
+### 山峦图
+```{r}
+library(ggridges)
+
+penguins %>%
+  ggplot(aes(y = species, x = bill_length_mm, fill = species)) +
+  ggridges::geom_density_ridges(alpha = 0.5)
+```
+
+
+
+
+## 嘴峰长度和嘴峰厚度之间的关系
+
+呈现两个连续变量的关联，最常用的是散点图
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point()
+```
+
+```{r}
+penguins %>%
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm)) +
+  geom_point(
+    aes(color = species, fill = species),
+    shape = 21,
+    alpha = 0.5,
+    size  = 4
+  )
+```
+
+
+
+
+
+## 图层叠加
+
+以下是不同性别企鹅体重的抖散图，三种方法是等价的
+
+```{r, eval=FALSE}
+
+ggplot() +
+  geom_jitter(data = penguins, aes(x = sex, y = body_mass_g))
+
+
+ggplot(data = penguins, aes(x = sex, y = body_mass_g)) +
+  geom_jitter()
+
+
+penguins %>%
+  ggplot(aes(x = sex, y = body_mass_g)) +
+  geom_jitter()
+```
+
+
+希望在图中显示出**均值的位置**
+
+```{r}
+m <- penguins %>%
+  group_by(sex) %>%
+  summarise(
+    b_mean = mean(body_mass_g)
+  )
+m
+```
+
+也可以画出均值的位置
+```{r}
+ggplot(data = m, aes(x = sex, y = b_mean)) +
+  geom_point(color = "red", size = 5)
+```
+
+
+图层叠加原理：每个图层都有自己的数据及其映射关系
+
+
+|  图层       	|  数据`data =`    	|  映射关系 `aes()`       	|
+|-------------	|-----------------	|--------------------------	|
+|  第一个图层 	| data = penguins 	| x = sex, y = body_mass_g 	|
+|  第二个图层 	| data = m        	| x = sex, y = b_mean      	|
+
+
+
+```{r}
+ggplot() +
+  geom_jitter(data = penguins, aes(x = sex, y = body_mass_g)) +
+  geom_point(data = m, aes(x = sex, y = b_mean), color = "red", size = 5)
+```
+
+
+继承原理：数据和映射关系可以从主函数**继承**，因此最终简化成下面的形式
+
+```{r}
+penguins %>%
+  ggplot(aes(x = sex, y = body_mass_g)) +
+  geom_jitter() +
+  geom_point(data = m, aes(y = b_mean), color = "red", size = 5)
+```
+
+
+
+**进阶**，在点的位置添加具体文本，因此会用到第三个图层
+
+```{r}
+penguins %>%
+  ggplot(aes(x = sex, y = body_mass_g)) +
+  geom_jitter() +
+  geom_point(data = m, aes(y = b_mean), size = 5, color = "red") +
+  geom_text(data = m,  aes(y = b_mean, label = round(b_mean, 2)), 
+            size = 5, color = "red", vjust = -1
+  )
+```
+
+
+
+
+## 地图
+
+### 世界地图
+```{r}
+library(rnaturalearth) 
+
+world_map_data <- ne_countries(scale = "medium", returnclass = "sf")
+
+ggplot(data = world_map_data) +
+  geom_sf(fill = "antiquewhite1") +
+  theme(panel.background = element_rect(fill = "aliceblue"))
+```
+
+
+### 美国地图
+```{r}
+library(maps)
+us_states <- map_data("state")
+
+us_states %>% 
+  ggplot(aes(x = long, y = lat, group = group)) + 
+  geom_polygon(fill = "white", color = "black")
+```
+
+
+```{r}
+us_states %>% 
+  ggplot(aes(x = long, y = lat, group = group, fill = region)) + 
+  geom_polygon(color = "gray90", size = 0.1) + 
+  guides(fill = FALSE)
+```
+
+
+### 四川地图
+
+读取四川县界地图
+```{r, message=FALSE, warning=FALSE}
+library(sf)
+sichuan <- st_read("./mapdata/sichuan_xianjie.shp")
+
+sichuan %>% 
+  mutate(value = sample(1:10, size = 164, replace = TRUE)) %>%
+  
+  ggplot() + 
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c() 
+```
+
+
+
+
+# 更多
+
+- `geom_col()`
+- `geom_histogram()`
+- `geom_density()`
+- `geom_jitter()`
+- `geom_boxplot()`
+- `geom_violin()`
+- `geom_point()`
+- `geom_smooth()`
+- `geom_line()`
+- `geom_text()`
+- `geom_pointrange()`
+- `geom_linerange()`
+- `geom_ribbon()`
+- `geom_area()`
+- `geom_path()`
+- `geom_segment()`
+- `geom_function()`
+
+
