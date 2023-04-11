@@ -181,7 +181,7 @@ df %>%
 从技术上讲就是，**行方向**求指定列的均值
 
 ```{r}
-df_expand <- df %>%
+df_expand_topic <- df %>%
   rowwise() %>%
   mutate(
     f_achievement  = mean(c_across(starts_with("a_achievement_"))),
@@ -203,7 +203,7 @@ df_expand <- df %>%
 
 统计某个变量的均值和方差，比如“achievement 成就认知”
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   select(contains("achievement")) %>% 
   tbl_summary(
     statistic = list(everything() ~ "{mean} ({sd})"),
@@ -218,7 +218,7 @@ df_expand %>%
 接着，统计“规则”这个主题得分的均值和方差
 
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   select(contains("rule")) %>% 
   
   gtsummary::tbl_summary(
@@ -241,7 +241,7 @@ df_expand %>%
 
 
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(gender = as.character(gender)) %>% 
   rstatix::t_test(total ~ gender) %>% 
   
@@ -253,7 +253,7 @@ df_expand %>%
 ```{r}
 library(ggstatsplot)
 
-df_expand %>% 
+df_expand_topic %>% 
   mutate(gender = as.character(gender)) %>% 
   ggbetweenstats(
     x  = gender,
@@ -266,7 +266,7 @@ df_expand %>%
 
 检验不同年龄组之间的得分是否存在显著差异
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(age = as.character(age)) %>% 
   rstatix::anova_test(total ~ age) %>% 
   flextable::flextable() %>% 
@@ -277,7 +277,7 @@ df_expand %>%
 
 ```{r}
 library(ggstatsplot)
-df_expand %>% 
+df_expand_topic %>% 
   mutate(age = as.character(age)) %>% 
   ggbetweenstats(
     x  = age,
@@ -288,7 +288,7 @@ df_expand %>%
 
 也可以多个变量统计表格汇总成一张大表，再次感受到`gtsummary`的贴心
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(
     across(c(age:position_level), as.character)
   ) %>%
@@ -307,7 +307,7 @@ df_expand %>%
 我们考察18个自变量及因变量之间的相关性，使用 `rstatix` 宏包
 
 ```{r, eval=FALSE}
-df_expand %>%
+df %>%
   select(starts_with("a_"), creativity) %>%
   rstatix::cor_mat(method = "pearson") %>% 
   flextable::flextable() %>% 
@@ -318,7 +318,7 @@ df_expand %>%
 ```{r, fig.asp=0.8, fig.width = 8}
 library(ggstatsplot)
 
-df_expand %>%
+df %>%
   select(starts_with("a_"), creativity) %>%
   ggcorrmat(
     output      = "plot",
@@ -436,7 +436,7 @@ bartlett.test(d_xvar)
 
 最后，重命名公共因子，然后并入原数据框`df`，为后续的回归分析做准备。
 ```{r}
-df_factor <- myfa$scores %>% 
+df_expand_factor <- myfa$scores %>% 
   as_tibble() %>% 
   bind_cols(df) %>% 
   relocate(id, .before = MR2) %>% 
@@ -455,9 +455,9 @@ df_factor <- myfa$scores %>%
 ```
 
 
-此时我们关注的是`df_factor`
+此时我们关注的是`df_expand_factor`
 ```{r}
-df_factor %>% 
+df_expand_factor %>% 
   select(
     Construction_of_Social_Relations,
     Perception_of_Achievement,
@@ -510,7 +510,7 @@ mod_linear <-
       Collective_Behaviors +
       Personal_Preference,
     
-    data = df_factor
+    data = df_expand_factor
   )
 ```
 

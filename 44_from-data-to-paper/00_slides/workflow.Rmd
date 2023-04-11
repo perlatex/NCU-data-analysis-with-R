@@ -346,7 +346,7 @@ knitr::include_graphics("./images/rowwise_mean.png")
 
 推荐如下写法
 ```{r}
-df_expand <- df %>%
+df_expand_topic <- df %>%
   rowwise() %>% #<<
   mutate(
     f_achievement  = mean(c_across(starts_with("a_achievement_"))),
@@ -364,12 +364,12 @@ df_expand <- df %>%
 ## 梳理变量层级
 
 ```{r, eval=FALSE}
-df_expand %>% 
+df_expand_topic %>% 
   select(starts_with("f"), creativity)
 ```
 
 ```{r, echo=FALSE}
-df_expand %>% 
+df_expand_topic %>% 
   select(starts_with("f"), creativity) %>% 
   head(12) %>% 
   gt::gt()
@@ -392,7 +392,7 @@ class: center, middle
 统计某个变量的.red[**均值和方差**]，比如“成就认知 achievement”
 .pull-left[
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   select(contains("achievement")) %>% 
   summarise(
     across(everything(), list(mean = mean, sd = sd))
@@ -412,7 +412,7 @@ df_expand %>%
 .pull-right[
 
 ```{r}
-df_expand %>% 
+df_expand_topic %>% 
   select(contains("achievement")) %>% 
   gtsummary::tbl_summary( #<<
     statistic = list(everything() ~ "{mean} ({sd})"),
@@ -439,14 +439,14 @@ class: center, middle
 <br>
 
 ```{r, echo=TRUE, eval=FALSE}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(gender = as.character(gender)) %>% 
   
   rstatix::t_test(total ~ gender) #<<
 ```
 
 ```{r, echo=FALSE}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(gender = as.character(gender)) %>% 
   rstatix::t_test(total ~ gender) %>% 
   gt::gt()
@@ -462,14 +462,14 @@ df_expand %>%
 检验不同.red[**年龄组**]之间的得分是否存在显著差异
 
 ```{r, eval=FALSE}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(age = as.character(age)) %>% 
   
   rstatix::anova_test(total ~ age)  #<<
 ```
 
 ```{r, echo=FALSE}
-df_expand %>% 
+df_expand_topic %>% 
   mutate(age = as.character(age)) %>% 
   rstatix::anova_test(total ~ age) %>% 
   gt::gt()
@@ -482,7 +482,7 @@ df_expand %>%
 
 ```{r}
 library(ggstatsplot)
-df_expand %>% 
+df_expand_topic %>% 
   mutate(age = as.character(age)) %>% 
   ggbetweenstats( #<<
     x  = age,
@@ -504,7 +504,7 @@ df_expand %>%
 ```{r, echo=TRUE, eval=FALSE}
 library(gtsummary)
 
-df_expand %>% 
+df_expand_topic %>% 
   mutate(
     across(c(age:position_level), as.character)
   ) %>%
@@ -527,7 +527,7 @@ df_expand %>%
 ```{r, echo=FALSE, eval=TRUE}
 library(gtsummary)
 
-df_expand %>% 
+df_expand_topic %>% 
   mutate(
     across(c(age:position_level), as.character)
   ) %>%
@@ -558,7 +558,7 @@ class: center, middle
 
 
 ```{r, eval=FALSE}
-df_expand %>%
+df %>%
   select(starts_with("a_"), creativity) %>%
   
   rstatix::cor_mat(method = "pearson") #<<
@@ -566,7 +566,7 @@ df_expand %>%
 
 
 ```{r, echo=FALSE}
-df_expand %>%
+df %>%
   select(starts_with("a_"), creativity) %>%
   rstatix::cor_mat(method = "pearson") %>% 
   gt::gt()
@@ -582,7 +582,7 @@ df_expand %>%
 ```{r, eval=FALSE}
 library(ggstatsplot)
 
-df_expand %>%
+df %>%
   select(starts_with("a_"), creativity) %>%
   
   ggcorrmat(                #<<
@@ -599,7 +599,7 @@ df_expand %>%
 ---
 
 ```{r, echo=FALSE, out.width="100%", fig.asp=0.8, fig.width = 9}
-df_expand %>%
+df %>%
   select(starts_with("a_"), creativity) %>%
   ggcorrmat(
     output      = "plot",
@@ -766,7 +766,7 @@ myfa$Vaccounted %>%
 ## 公共因子并入原数据框
 
 ```{r}
-df_factor <- myfa$scores %>% 
+df_expand_factor <- myfa$scores %>% 
   as_tibble() %>% 
   bind_cols(df) %>%  #<<
   
@@ -782,15 +782,15 @@ df_factor <- myfa$scores %>%
   mutate(creativity = mean(c_across(cols = starts_with("b_")))) %>% 
   ungroup()
 
-# df_factor
+# df_expand_factor
 ```
 
 
 ---
-## 此时的数据集 df_factor
+## 此时的数据集 df_expand_factor
 
 ```{r, echo=FALSE}
-df_factor %>% 
+df_expand_factor %>% 
   select(
     id, 
     Construction_of_Social_Relations, 
@@ -855,7 +855,7 @@ mod_linear <-
       Collective_Behaviors +
       Personal_Preference,
     
-    data = df_factor
+    data = df_expand_factor
   )
 
 # summary(mod_linear)
