@@ -349,7 +349,7 @@ sum( resid(mod1)^2 / 1377) %>% sqrt()
 
 ### 拟合优度
 
-$R^2$ 代表着拟合优度（Goodness of Fit），它指回归直线对观测值的拟合程度。
+$R^2$ 代表着拟合优度（Goodness of Fit），它指回归直线对观测值的拟合程度，可以计算为模型可解释的方差占总方差的比例。
 
 ```{r}
 summary(mod1)$r.squared
