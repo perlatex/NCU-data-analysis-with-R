@@ -678,6 +678,22 @@ df %>%
 **课堂练习**，统计每个学科的均值和标准差。
 
 
+## group_by() 与 ungroup()
+```{r}
+df %>%
+  group_by(name) %>%
+  summarise(
+    mean_score = mean(total)
+  )
+
+df %>%
+  group_by(name) %>%
+  ungroup() %>% 
+  summarise(
+    mean_score = mean(total)
+  )
+```
+
 
 # 排序`arrange()`
 
