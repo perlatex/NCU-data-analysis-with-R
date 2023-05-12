@@ -3,7 +3,7 @@
 
 ```{r}
 my_pkgs <- 
-  c("tidyverse", "palmerpenguins", "sf", "janitor", "rstatix", "report",
+  c("tidyverse", "palmerpenguins", "sf", "janitor", "rstatix", "report", "openxlsx",
     "devtools", "broom", "gt", "gtsummary", "haven", "ggridges", "ggstatsplot",
     "modelsummary", "readxl", "rmarkdown", "scales", "pysch", "equatiomatic",
     "officedown", "flextable", "marginaleffects", "showtext", "colorspace",
@@ -12,7 +12,7 @@ my_pkgs <-
 
 install.packages(my_pkgs, 
     repos = "http://mirrors.tuna.tsinghua.edu.cn/CRAN", 
-    dependencies = T
+    dependencies = TRUE
 )
 ```
 
