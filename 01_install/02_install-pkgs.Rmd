@@ -7,7 +7,7 @@ my_pkgs <-
     "devtools", "broom", "gt", "gtsummary", "haven", "ggridges", "ggstatsplot",
     "modelsummary", "readxl", "rmarkdown", "scales", "pysch", "equatiomatic",
     "officedown", "flextable", "marginaleffects", "showtext", "colorspace",
-    "cowplot", "patchwork", "MetBrewer", "styler", "ggtheme", "bookdown"
+    "cowplot", "patchwork", "MetBrewer", "styler", "ggtheme", "bookdown", "lavaan"
     )
 
 install.packages(my_pkgs, 
